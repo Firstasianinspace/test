@@ -4,6 +4,7 @@ import { StatusBadge } from '@/presentation/components/StatusBadge';
 import { Button } from '@/presentation/components/ui/button';
 import { Input, Select, Textarea } from '@/presentation/components/ui/input';
 import { useSession } from '@/presentation/hooks/useSession';
+import { useSingleFlight } from '@/presentation/hooks/useSingleFlight';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -27,6 +28,7 @@ export function ObjectDetailPage() {
   const [description, setDescription] = useState('');
   const [assigneeId, setAssigneeId] = useState('');
 
+  const once = useSingleFlight();
   const create = useMutation({
     mutationFn: () => {
       if (!user) throw new Error('no user');
@@ -71,7 +73,9 @@ export function ObjectDetailPage() {
           className="space-y-2 rounded-md border bg-white p-3"
           onSubmit={(e) => {
             e.preventDefault();
-            create.mutate();
+            once((done) => {
+              create.mutate(undefined, { onSettled: done });
+            });
           }}
         >
           <h2 className="font-medium">Новая задача</h2>
@@ -104,7 +108,9 @@ export function ObjectDetailPage() {
             ))}
           </Select>
           <ErrorText error={create.error} />
-          <Button type="submit">Создать задачу</Button>
+          <Button type="submit" disabled={create.isPending}>
+            Создать задачу
+          </Button>
         </form>
       )}
     </div>

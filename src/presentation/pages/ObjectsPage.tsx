@@ -3,6 +3,7 @@ import { ErrorText } from '@/presentation/components/ErrorText';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 import { useSession } from '@/presentation/hooks/useSession';
+import { useSingleFlight } from '@/presentation/hooks/useSingleFlight';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -18,6 +19,8 @@ export function ObjectsPage() {
   const [editing, setEditing] = useState<string | null>(null);
 
   const refresh = () => qc.invalidateQueries({ queryKey: ['objects'] });
+  const submitOnce = useSingleFlight();
+  const removeOnce = useSingleFlight();
   const create = useMutation({
     mutationFn: () => uc.createObject.execute({ name, address }),
     onSuccess: async () => {
@@ -65,8 +68,11 @@ export function ObjectsPage() {
                 </Button>
                 <Button
                   variant="danger"
+                  disabled={remove.isPending}
                   onClick={() => {
-                    remove.mutate(o.id);
+                    removeOnce((done) => {
+                      remove.mutate(o.id, { onSettled: done });
+                    });
                   }}
                 >
                   Удалить
@@ -82,8 +88,10 @@ export function ObjectsPage() {
           className="space-y-2 rounded-md border bg-white p-3"
           onSubmit={(e) => {
             e.preventDefault();
-            if (editing) update.mutate(editing);
-            else create.mutate();
+            submitOnce((done) => {
+              if (editing) update.mutate(editing, { onSettled: done });
+              else create.mutate(undefined, { onSettled: done });
+            });
           }}
         >
           <h2 className="font-medium">{editing ? 'Редактирование объекта' : 'Новый объект'}</h2>
@@ -102,7 +110,9 @@ export function ObjectsPage() {
             }}
           />
           <div className="flex gap-2">
-            <Button type="submit">{editing ? 'Сохранить' : 'Создать'}</Button>
+            <Button type="submit" disabled={create.isPending || update.isPending}>
+              {editing ? 'Сохранить' : 'Создать'}
+            </Button>
             {editing && (
               <Button
                 variant="outline"
