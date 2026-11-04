@@ -10,13 +10,13 @@ export function useSession() {
     loading: query.isLoading,
     signIn: async (email: string, password: string) => {
       const user = await uc.signIn.execute(email, password);
-      qc.clear();
       qc.setQueryData(['me'], user);
+      qc.removeQueries({ predicate: (q) => q.queryKey[0] !== 'me' });
     },
     signOut: async () => {
       await uc.signOut.execute();
-      qc.clear();
       qc.setQueryData(['me'], null);
+      qc.removeQueries({ predicate: (q) => q.queryKey[0] !== 'me' });
     },
   };
 }
