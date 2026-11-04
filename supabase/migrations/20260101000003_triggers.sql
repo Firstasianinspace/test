@@ -102,3 +102,9 @@ end $$;
 create trigger tasks_log_status_change after update of status on public.tasks
   for each row when (old.status is distinct from new.status)
   execute function private.tasks_log_status_change();
+
+-- Trigger functions are never called directly; nobody needs EXECUTE on them.
+revoke execute on function
+  private.tasks_before_insert(), private.tasks_check_assignee(), private.tasks_immutable(),
+  private.tasks_validate_status_change(), private.tasks_log_insert(), private.tasks_log_status_change()
+from public, anon, authenticated;
