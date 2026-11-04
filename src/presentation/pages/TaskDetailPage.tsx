@@ -6,6 +6,7 @@ import { TaskActions } from '@/presentation/components/TaskActions';
 import { Button } from '@/presentation/components/ui/button';
 import { Input, Select, Textarea } from '@/presentation/components/ui/input';
 import { useSession } from '@/presentation/hooks/useSession';
+import { useSingleFlight } from '@/presentation/hooks/useSingleFlight';
 import { STATUS_LABEL } from '@/presentation/labels';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -60,12 +61,16 @@ export function TaskDetailPage() {
       qc.invalidateQueries({ queryKey: ['object-tasks'] }),
     ]);
   };
+  const changeOnce = useSingleFlight();
+  const saveOnce = useSingleFlight();
+  const removeOnce = useSingleFlight();
   const change = useMutation({
     mutationFn: ({ to, comment }: { to: TaskStatus; comment?: string }) => {
       if (!user) throw new Error('no user');
       return uc.changeTaskStatus.execute(id, to, user, comment);
     },
-    onSuccess: refresh,
+    // Refresh on error as well: a rejected transition means our view was stale.
+    onSettled: refresh,
   });
   const save = useMutation({
     mutationFn: () => {
@@ -122,7 +127,9 @@ export function TaskDetailPage() {
         user={user}
         pending={change.isPending}
         onChange={(to, comment) => {
-          change.mutate(comment === undefined ? { to } : { to, comment });
+          changeOnce((done) => {
+            change.mutate(comment === undefined ? { to } : { to, comment }, { onSettled: done });
+          });
         }}
       />
       <ErrorText error={change.error ?? save.error ?? remove.error} />
@@ -141,8 +148,11 @@ export function TaskDetailPage() {
           </Button>
           <Button
             variant="danger"
+            disabled={remove.isPending}
             onClick={() => {
-              remove.mutate();
+              removeOnce((done) => {
+                remove.mutate(undefined, { onSettled: done });
+              });
             }}
           >
             Удалить задачу
@@ -154,7 +164,9 @@ export function TaskDetailPage() {
           className="space-y-2 rounded-md border bg-white p-3"
           onSubmit={(e) => {
             e.preventDefault();
-            save.mutate();
+            saveOnce((done) => {
+              save.mutate(undefined, { onSettled: done });
+            });
           }}
         >
           <Input
@@ -186,7 +198,9 @@ export function TaskDetailPage() {
             ))}
           </Select>
           <div className="flex gap-2">
-            <Button type="submit">Сохранить</Button>
+            <Button type="submit" disabled={save.isPending}>
+              Сохранить
+            </Button>
             <Button
               variant="outline"
               type="button"
