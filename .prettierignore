@@ -1,0 +1,9 @@
+node_modules
+dist
+pnpm-lock.yaml
+src/infrastructure/supabase/database.types.ts
+.agents
+.claude
+skills-lock.json
+ASSIGNMENT.md
+plan.md
