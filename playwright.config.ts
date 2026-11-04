@@ -5,7 +5,9 @@ export default defineConfig({
   workers: 1,
   use: { baseURL: 'http://127.0.0.1:5173' },
   webServer: {
-    command: 'pnpm dev --host 127.0.0.1 --port 5173',
+    command: process.env.E2E_PREVIEW
+      ? 'pnpm build && pnpm exec vite preview --host 127.0.0.1 --port 5173 --strictPort'
+      : 'pnpm dev --host 127.0.0.1 --port 5173',
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: true,
   },
