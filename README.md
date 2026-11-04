@@ -7,7 +7,7 @@ React + TypeScript + Supabase. Постановщик ставит задачи 
 Нужны Node 22+, pnpm, Docker.
 
 ```bash
-pnpm install
+pnpm install                # pnpm 10+; скрипт сборки esbuild отключён осознанно (pnpm-workspace.yaml)
 pnpm supabase start        # поднимает локальный Supabase, применяет миграции и seed
 cp .env.example .env.local # впишите URL и anon key из `pnpm supabase status`
 pnpm dev                   # http://127.0.0.1:5173
