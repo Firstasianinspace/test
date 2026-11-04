@@ -12,6 +12,7 @@
     "test": "vitest run --project unit",
     "test:db": "node scripts/with-supabase-env.mjs vitest run --project db",
     "e2e": "node scripts/with-supabase-env.mjs playwright test",
+    "e2e:prod": "E2E_PREVIEW=1 node scripts/with-supabase-env.mjs playwright test",
     "format": "prettier --write .",
     "supabase": "supabase",
     "gen:types": "supabase gen types typescript --local > src/infrastructure/supabase/database.types.ts"
