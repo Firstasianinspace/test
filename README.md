@@ -29,6 +29,7 @@ pnpm dev                   # http://127.0.0.1:5173
 pnpm lint && pnpm typecheck && pnpm test   # юнит-тесты и линтер
 pnpm test:db                               # тесты безопасности БД (нужен запущенный локальный Supabase)
 pnpm e2e                                   # Playwright (локальный Supabase + seed)
+pnpm e2e:prod                              # те же e2e на production-сборке с CSP и заголовками безопасности
 ```
 
 ## Структура
@@ -37,7 +38,7 @@ pnpm e2e                                   # Playwright (локальный Supa
 - `supabase/seed.sql` — демо-данные (3 объекта, 7 задач во всех статусах).
 - `supabase/tests/` — интеграционные тесты безопасности.
 - `src/domain`, `src/application`, `src/infrastructure`, `src/presentation` — чистая архитектура (границы проверяет ESLint).
-- `docs/` — ТЗ, допущения, результаты проверок безопасности, объяснение для руководителя.
+- `docs/` — ТЗ, допущения, результаты проверок безопасности, OWASP / гонки / производительность (`OWASP-AND-PERFORMANCE.md`), объяснение для руководителя.
 
 ## Безопасность в двух словах
 
