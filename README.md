@@ -45,7 +45,7 @@ pnpm e2e                                   # Playwright (локальный Supa
 
 ## Демо
 
-Приложение: https://mini-crm-objects-tasks-firstasianinspaces-projects.vercel.app (Vercel, база — облачный Supabase). Логины демо-пользователей (1 постановщик, 2 исполнителя: `manager@example.com`, `ivan@example.com`, `petr@example.com`) и пароли указаны в сопроводительном сообщении, в репозитории паролей нет.
+Приложение: https://mini-crm-objects-tasks.vercel.app (Vercel, база — облачный Supabase). Логины демо-пользователей (1 постановщик, 2 исполнителя: `manager@example.com`, `ivan@example.com`, `petr@example.com`) и пароли указаны в сопроводительном сообщении, в репозитории паролей нет.
 
 ## Облако и деплой
 
